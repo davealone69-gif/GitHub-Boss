@@ -32,3 +32,4 @@ jobs:
           name: app-debug-apk
           path: "**/build/outputs/apk/debug/*.apk"
           retention-days: 14
+
