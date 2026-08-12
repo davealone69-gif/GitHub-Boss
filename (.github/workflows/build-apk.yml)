@@ -38,30 +38,3 @@ jobs:
         with:
           name: app-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
-# ... (rest of your file)
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-        # Add this line below. Replace 'app' with the actual name of your Android module folder.
-        working-directory: app 
-
-      - name: Build debug APK
-        run: ./gradlew assembleDebug
-        # Add this line below as well.
-        working-directory: app
-
-      - name: Upload APK Artifact
-        # ... (rest of your file)
-# ... (previous steps remain the same)
-
-      - name: Grant execute permission for gradlew
-        # Add this line. Replace 'app' if your main module has a different name.
-        working-directory: app 
-        run: chmod +x gradlew
-
-      - name: Build debug APK
-        # Add this line here as well.
-        working-directory: app
-        run: ./gradlew assembleDebug
-
-# ... (following steps remain the same)
