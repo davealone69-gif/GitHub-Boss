@@ -52,3 +52,16 @@ jobs:
 
       - name: Upload APK Artifact
         # ... (rest of your file)
+# ... (previous steps remain the same)
+
+      - name: Grant execute permission for gradlew
+        # Add this line. Replace 'app' if your main module has a different name.
+        working-directory: app 
+        run: chmod +x gradlew
+
+      - name: Build debug APK
+        # Add this line here as well.
+        working-directory: app
+        run: ./gradlew assembleDebug
+
+# ... (following steps remain the same)
