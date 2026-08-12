@@ -1,9 +1,19 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+import org.gradle.kotlin.dsl.kotlin
+
+buildscript {
+    dependencies {
+        classpath("com.android.tools.build:gradle:8.2.2")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22")
+    }
+}
+
 plugins {
-  alias(libs.plugins.android.application) apply false
-  alias(libs.plugins.kotlin.compose) apply false
-  alias(libs.plugins.google.devtools.ksp) apply false
-  alias(libs.plugins.roborazzi) apply false
-  alias(libs.plugins.secrets) apply false
-  alias(libs.plugins.google.services) apply false
+    // Version catalogs or other plugins can go here if needed
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
 }
