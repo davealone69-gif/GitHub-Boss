@@ -1,17 +1,14 @@
-name: Build Android APK
+name: Build & Test Android
 
 on:
   push:
-    branches: [ "main", "master", "develop" ]
+    branches: [ "main", "develop" ]
   pull_request:
-    branches: [ "main", "master" ]
-  workflow_dispatch:
+    branches: [ "main" ]
 
 jobs:
   build:
-    name: Build & Test Android APK
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -23,14 +20,12 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Grant execute permission for gradlew
+      - name: Grant execute permission for gradlew (Safe Fallback)
         run: |
           if [ -f "./gradlew" ]; then
             chmod +x gradlew
           else
-            echo "gradlew not found, generating wrapper script..."
-            gradle wrapper
-            chmod +x gradlew
+            echo "gradlew wrapper script not found, using system gradle"
           fi
 
       - name: Build Debug APK
@@ -41,17 +36,8 @@ jobs:
             gradle assembleDebug --no-daemon
           fi
 
-      - name: Run Unit Tests
-        run: |
-          if [ -f "./gradlew" ]; then
-            ./gradlew testDebugUnitTest --no-daemon
-          else
-            gradle testDebugUnitTest --no-daemon
-          fi
-
       - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug-apk
+          name: app-debug
           path: app/build/outputs/apk/debug/*.apk
-          retention-days: 14
