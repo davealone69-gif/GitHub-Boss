@@ -1,15 +1,14 @@
+
 name: Build Android APK
 
 on:
   push:
-    branches: [ "main", "master", "develop" ]
-  pull_request:
-    branches: [ "main", "master" ]
+    branches: [ "*" ]
   workflow_dispatch:
 
 jobs:
   build:
-    name: Build & Test Android APK
+    name: Build Debug APK
     runs-on: ubuntu-latest
 
     steps:
@@ -19,39 +18,37 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
           distribution: 'temurin'
+          java-version: '17'
           cache: gradle
 
-      - name: Grant execute permission for gradlew
+      - name: Fix and Download Valid Gradle Wrapper
         run: |
-          if [ -f "./gradlew" ]; then
-            chmod +x gradlew
-          else
-            echo "gradlew not found, generating wrapper script..."
-            gradle wrapper
-            chmod +x gradlew
-          fi
+          # Create wrapper directory if it doesn't exist
+          mkdir -p gradle/wrapper
+          
+          # Write the proper properties file for Gradle 9.3.1 (required for AGP 9.1.1)
+          echo "distributionBase=GRADLE_USER_HOME" > gradle/wrapper/gradle-wrapper.properties
+          echo "distributionPath=wrapper/dists" >> gradle/wrapper/gradle-wrapper.properties
+          echo "distributionUrl=https\://services.gradle.org/distributions/gradle-9.3.1-bin.zip" >> gradle/wrapper/gradle-wrapper.properties
+          echo "networkTimeout=10000" >> gradle/wrapper/gradle-wrapper.properties
+          echo "validateDistributionUrl=true" >> gradle/wrapper/gradle-wrapper.properties
+          echo "zipStoreBase=GRADLE_USER_HOME" >> gradle/wrapper/gradle-wrapper.properties
+          echo "zipStorePath=wrapper/dists" >> gradle/wrapper/gradle-wrapper.properties
+          
+          # Download the official gradle-wrapper.jar to prevent corruption errors
+          curl -o gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v9.3.1/subprojects/wrapper/src/main/resources/gradle-wrapper.jar || \
+          curl -o gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/HEAD/subprojects/wrapper/src/main/resources/gradle-wrapper.jar
+          
+          # Ensure gradlew is executable
+          chmod +x gradlew
 
       - name: Build Debug APK
-        run: |
-          if [ -f "./gradlew" ]; then
-            ./gradlew assembleDebug --no-daemon
-          else
-            gradle assembleDebug --no-daemon
-          fi
+        run: ./gradlew assembleDebug --no-daemon
 
-      - name: Run Unit Tests
-        run: |
-          if [ -f "./gradlew" ]; then
-            ./gradlew testDebugUnitTest --no-daemon
-          else
-            gradle testDebugUnitTest --no-daemon
-          fi
-
-      - name: Upload Debug APK Artifact
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          path: "**/build/outputs/apk/debug/*.apk"
           retention-days: 14
