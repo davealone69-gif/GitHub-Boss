@@ -1,4 +1,3 @@
-
 name: Build Android APK
 
 on:
@@ -20,31 +19,12 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: gradle
 
-      - name: Fix and Download Valid Gradle Wrapper
-        run: |
-          # Create wrapper directory if it doesn't exist
-          mkdir -p gradle/wrapper
-          
-          # Write the proper properties file for Gradle 9.3.1 (required for AGP 9.1.1)
-          echo "distributionBase=GRADLE_USER_HOME" > gradle/wrapper/gradle-wrapper.properties
-          echo "distributionPath=wrapper/dists" >> gradle/wrapper/gradle-wrapper.properties
-          echo "distributionUrl=https\://services.gradle.org/distributions/gradle-9.3.1-bin.zip" >> gradle/wrapper/gradle-wrapper.properties
-          echo "networkTimeout=10000" >> gradle/wrapper/gradle-wrapper.properties
-          echo "validateDistributionUrl=true" >> gradle/wrapper/gradle-wrapper.properties
-          echo "zipStoreBase=GRADLE_USER_HOME" >> gradle/wrapper/gradle-wrapper.properties
-          echo "zipStorePath=wrapper/dists" >> gradle/wrapper/gradle-wrapper.properties
-          
-          # Download the official gradle-wrapper.jar to prevent corruption errors
-          curl -o gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v9.3.1/subprojects/wrapper/src/main/resources/gradle-wrapper.jar || \
-          curl -o gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/HEAD/subprojects/wrapper/src/main/resources/gradle-wrapper.jar
-          
-          # Ensure gradlew is executable
-          chmod +x gradlew
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
 
-      - name: Build Debug APK
-        run: ./gradlew assembleDebug --no-daemon
+      - name: Build Debug APK with Gradle
+        run: gradle assembleDebug --no-daemon
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
