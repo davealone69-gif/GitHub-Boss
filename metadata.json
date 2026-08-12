@@ -1,0 +1,6 @@
+{
+  "name": "Android App Builder",
+  "description": "A Jetpack Compose app for managing and showcasing Android project templates and configurations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
