@@ -33,6 +33,12 @@ class GitHubViewModel(application: Application) : AndroidViewModel(application) 
     private val _workflowRunsState = MutableStateFlow<ApiResult<List<GitHubWorkflowRun>>>(ApiResult.Success(emptyList()))
     val workflowRunsState: StateFlow<ApiResult<List<GitHubWorkflowRun>>> = _workflowRunsState.asStateFlow()
 
+    private val _notificationsState = MutableStateFlow<ApiResult<List<GitHubNotification>>>(ApiResult.Success(emptyList()))
+    val notificationsState: StateFlow<ApiResult<List<GitHubNotification>>> = _notificationsState.asStateFlow()
+
+    private val _searchState = MutableStateFlow<ApiResult<List<GitHubRepo>>>(ApiResult.Success(emptyList()))
+    val searchState: StateFlow<ApiResult<List<GitHubRepo>>> = _searchState.asStateFlow()
+
     private val _selectedRepo = MutableStateFlow<GitHubRepo?>(null)
     val selectedRepo: StateFlow<GitHubRepo?> = _selectedRepo.asStateFlow()
 
@@ -81,31 +87,29 @@ class GitHubViewModel(application: Application) : AndroidViewModel(application) 
         _reposState.value = ApiResult.Success(emptyList())
         _issuesState.value = ApiResult.Success(emptyList())
         _workflowRunsState.value = ApiResult.Success(emptyList())
+        _notificationsState.value = ApiResult.Success(emptyList())
+        _searchState.value = ApiResult.Success(emptyList())
         _selectedRepo.value = null
     }
 
     fun refreshData() {
         val token = tokenManager.getToken() ?: return
         viewModelScope.launch {
-            // Fetch repositories
             _reposState.value = ApiResult.Loading
             val reposRes = gitHubRepo.getUserRepos(token)
             _reposState.value = reposRes
 
-            if (reposRes is ApiResult.Success && reposRes.data.isNotEmpty()) {
-                if (_selectedRepo.value == null) {
-                    _selectedRepo.value = reposRes.data.first()
-                }
+            if (reposRes is ApiResult.Success && reposRes.data.isNotEmpty() && _selectedRepo.value == null) {
+                _selectedRepo.value = reposRes.data.first()
             }
 
-            // Fetch issues
             _issuesState.value = ApiResult.Loading
             _issuesState.value = gitHubRepo.getUserIssues(token)
 
-            // Fetch workflow runs for selected repo if available
-            _selectedRepo.value?.let { repo ->
-                fetchWorkflowRuns(repo)
-            }
+            _notificationsState.value = ApiResult.Loading
+            _notificationsState.value = gitHubRepo.getNotifications(token)
+
+            _selectedRepo.value?.let { fetchWorkflowRuns(it) }
         }
     }
 
@@ -118,7 +122,8 @@ class GitHubViewModel(application: Application) : AndroidViewModel(application) 
         val token = tokenManager.getToken() ?: return
         viewModelScope.launch {
             _workflowRunsState.value = ApiResult.Loading
-            _workflowRunsState.value = gitHubRepo.getRepoWorkflowRuns(token, repo.owner?.login ?: repo.fullName.substringBefore("/"), repo.name)
+            val owner = repo.owner?.login ?: repo.fullName.substringBefore("/")
+            _workflowRunsState.value = gitHubRepo.getRepoWorkflowRuns(token, owner, repo.name)
         }
     }
 
@@ -128,14 +133,38 @@ class GitHubViewModel(application: Application) : AndroidViewModel(application) 
             _repoCreationState.value = ApiResult.Loading
             val result = gitHubRepo.createRepository(token, name, description, isPrivate)
             _repoCreationState.value = result
-            if (result is ApiResult.Success) {
-                refreshData()
-            }
+            if (result is ApiResult.Success) refreshData()
         }
     }
 
     fun clearRepoCreationState() {
         _repoCreationState.value = null
+    }
+
+    fun starSelectedRepo() {
+        val token = tokenManager.getToken() ?: return
+        val repo = _selectedRepo.value ?: return
+        val owner = repo.owner?.login ?: repo.fullName.substringBefore("/")
+        viewModelScope.launch {
+            gitHubRepo.starRepo(token, owner, repo.name)
+        }
+    }
+
+    fun unstarSelectedRepo() {
+        val token = tokenManager.getToken() ?: return
+        val repo = _selectedRepo.value ?: return
+        val owner = repo.owner?.login ?: repo.fullName.substringBefore("/")
+        viewModelScope.launch {
+            gitHubRepo.unstarRepo(token, owner, repo.name)
+        }
+    }
+
+    fun searchRepos(query: String) {
+        val token = tokenManager.getToken() ?: return
+        viewModelScope.launch {
+            _searchState.value = ApiResult.Loading
+            _searchState.value = gitHubRepo.searchRepositories(token, query)
+        }
     }
 
     fun getSavedToken(): String? = tokenManager.getToken()
