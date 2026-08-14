@@ -85,3 +85,28 @@ data class CreateRepoRequest(
     val private: Boolean = false,
     @Json(name = "auto_init") val autoInit: Boolean = true
 )
+
+@JsonClass(generateAdapter = true)
+data class GitHubNotification(
+    val id: String,
+    val unread: Boolean = true,
+    val reason: String?,
+    @Json(name = "updated_at") val updatedAt: String?,
+    val subject: NotificationSubject?,
+    val repository: GitHubRepo?
+)
+
+@JsonClass(generateAdapter = true)
+data class NotificationSubject(
+    val title: String?,
+    val type: String?,
+    val url: String?,
+    @Json(name = "latest_comment_url") val latestCommentUrl: String?
+)
+
+@JsonClass(generateAdapter = true)
+data class SearchReposResponse(
+    @Json(name = "total_count") val totalCount: Int,
+    @Json(name = "incomplete_results") val incompleteResults: Boolean = false,
+    val items: List<GitHubRepo>
+)
