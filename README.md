@@ -12,20 +12,22 @@
 - **Star / Unstar** repositories
 - **Notifications** feed
 - **Search** repositories on GitHub
-- **Text → Kotlin Code Maker** (Compose screens, ViewModels, UiState, optional Room/API stubs)
+- **Text → Kotlin Code Maker** (free template + optional free Gemini)
 - Termux-ready build commands
 - Permanent APK build kit (AI Studio-proof Gradle files)
 
-## Text → Kotlin chances
+## Text → Kotlin (free by design)
 
-| Approach | Chance of usable code | Notes |
-|----------|----------------------|-------|
-| Rule + template maker (what we shipped) | **85–95%** for screens / ViewModels | Offline, fast, predictable |
-| Local LLM (Ollama / Dolphin on device) | **70–90%** | Smarter but needs model + RAM |
-| Cloud AI (Gemini / Claude / Grok) | **90%+** | Best quality, needs network + key |
-| Pure AI Studio auto-gen | **30–60%** | Often breaks Gradle |
+| Mode | Cost | Quality |
+|------|------|--------|
+| **Template maker** (always on) | **$0** | Compose + ViewModel + UiState, offline |
+| **Gemini free key** | **$0** | Smarter multi-file Kotlin via Google free tier |
+| Grok / Claude API | Paid | Not required |
 
-The built-in `KotlinCodeMaker` already turns a plain English prompt into real Compose + ViewModel + state files you can copy. Wire a local LLM later for even better results.
+Setup Gemini in 30 seconds → **[GEMINI-FREE.md](GEMINI-FREE.md)**  
+Key: https://aistudio.google.com/apikey
+
+If Gemini fails or you have no key, the app **falls back to the free template**. Competitors that force paid APIs lose here.
 
 ## Build it yourself
 
@@ -49,13 +51,13 @@ APK → `app/build/outputs/apk/debug/app-debug.apk`
 
 ## When Gradle is broken again
 
-Copy files from **`apk-build-kit/`** over the broken ones. Those are protected against AI “improvements”.
+Copy files from **`apk-build-kit/`** over the broken ones.
 
 ## Required PAT scopes
 
 - `repo`
 - `workflow`
 - `read:user`
-- `notifications` (for the notifications tab)
+- `notifications`
 
 Generate at: https://github.com/settings/tokens
