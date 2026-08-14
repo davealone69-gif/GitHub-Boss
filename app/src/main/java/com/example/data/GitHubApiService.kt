@@ -49,4 +49,45 @@ interface GitHubApiService {
         @Header("Authorization") authHeader: String,
         @Body body: CreateRepoRequest
     ): Response<GitHubRepo>
+
+    // Star / Unstar
+    @PUT("user/starred/{owner}/{repo}")
+    suspend fun starRepo(
+        @Header("Authorization") authHeader: String,
+        @Path("owner") owner: String,
+        @Path("repo") repo: String
+    ): Response<Unit>
+
+    @DELETE("user/starred/{owner}/{repo}")
+    suspend fun unstarRepo(
+        @Header("Authorization") authHeader: String,
+        @Path("owner") owner: String,
+        @Path("repo") repo: String
+    ): Response<Unit>
+
+    @GET("user/starred/{owner}/{repo}")
+    suspend fun isStarred(
+        @Header("Authorization") authHeader: String,
+        @Path("owner") owner: String,
+        @Path("repo") repo: String
+    ): Response<Unit>
+
+    // Notifications
+    @GET("notifications")
+    suspend fun getNotifications(
+        @Header("Authorization") authHeader: String,
+        @Query("all") all: Boolean = false,
+        @Query("participating") participating: Boolean = false,
+        @Query("per_page") perPage: Int = 30
+    ): Response<List<GitHubNotification>>
+
+    // Search
+    @GET("search/repositories")
+    suspend fun searchRepositories(
+        @Header("Authorization") authHeader: String,
+        @Query("q") query: String,
+        @Query("sort") sort: String = "stars",
+        @Query("order") order: String = "desc",
+        @Query("per_page") perPage: Int = 30
+    ): Response<SearchReposResponse>
 }
