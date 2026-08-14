@@ -21,18 +21,18 @@ class GitHubRepository {
         .build()
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BODY
+        level = HttpLoggingInterceptor.Level.BASIC
     }
 
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(loggingInterceptor)
         .connectTimeout(15, TimeUnit.SECONDS)
-        .readTimeout(15, TimeUnit.SECONDS)
+        .readTimeout(20, TimeUnit.SECONDS)
         .addInterceptor { chain ->
             val request = chain.request().newBuilder()
                 .header("Accept", "application/vnd.github+json")
                 .header("X-GitHub-Api-Version", "2022-11-28")
-                .header("User-Agent", "Android-GitHub-App")
+                .header("User-Agent", "GitHub-Boss-Android")
                 .build()
             chain.proceed(request)
         }
@@ -62,15 +62,15 @@ class GitHubRepository {
             } else {
                 ApiResult.Error(
                     message = when (response.code()) {
-                        401 -> "Invalid Personal Access Token. Please check token permissions."
-                        403 -> "API Rate limit exceeded or access forbidden."
-                        else -> "Failed to authenticate: ${response.message()} (Code ${response.code()})"
+                        401 -> "Invalid Personal Access Token. Check scopes (repo, workflow, read:user, notifications)."
+                        403 -> "API rate limit or forbidden."
+                        else -> "Auth failed: ${response.message()} (${response.code()})"
                     },
                     statusCode = response.code()
                 )
             }
         } catch (e: Exception) {
-            ApiResult.Error(e.localizedMessage ?: "Network connection error")
+            ApiResult.Error(e.localizedMessage ?: "Network error")
         }
     }
 
@@ -80,10 +80,10 @@ class GitHubRepository {
             if (response.isSuccessful && response.body() != null) {
                 ApiResult.Success(response.body()!!)
             } else {
-                ApiResult.Error("Failed to fetch repositories: ${response.message()}", response.code())
+                ApiResult.Error("Failed to fetch repos: ${response.message()}", response.code())
             }
         } catch (e: Exception) {
-            ApiResult.Error(e.localizedMessage ?: "Failed to connect to GitHub API")
+            ApiResult.Error(e.localizedMessage ?: "Network error")
         }
     }
 
@@ -96,20 +96,7 @@ class GitHubRepository {
                 ApiResult.Error("Failed to fetch issues: ${response.message()}", response.code())
             }
         } catch (e: Exception) {
-            ApiResult.Error(e.localizedMessage ?: "Failed to connect to GitHub API")
-        }
-    }
-
-    suspend fun getRepoIssues(token: String, owner: String, repo: String): ApiResult<List<GitHubIssue>> {
-        return try {
-            val response = apiService.getRepoIssues(formatAuthHeader(token), owner, repo)
-            if (response.isSuccessful && response.body() != null) {
-                ApiResult.Success(response.body()!!)
-            } else {
-                ApiResult.Error("Failed to fetch issues for $owner/$repo: ${response.message()}", response.code())
-            }
-        } catch (e: Exception) {
-            ApiResult.Error(e.localizedMessage ?: "Failed to connect to GitHub API")
+            ApiResult.Error(e.localizedMessage ?: "Network error")
         }
     }
 
@@ -122,11 +109,16 @@ class GitHubRepository {
                 ApiResult.Error("Failed to fetch workflow runs: ${response.message()}", response.code())
             }
         } catch (e: Exception) {
-            ApiResult.Error(e.localizedMessage ?: "Failed to connect to GitHub API")
+            ApiResult.Error(e.localizedMessage ?: "Network error")
         }
     }
 
-    suspend fun createRepository(token: String, name: String, description: String?, isPrivate: Boolean): ApiResult<GitHubRepo> {
+    suspend fun createRepository(
+        token: String,
+        name: String,
+        description: String?,
+        isPrivate: Boolean
+    ): ApiResult<GitHubRepo> {
         return try {
             val request = CreateRepoRequest(name = name, description = description, private = isPrivate)
             val response = apiService.createRepository(formatAuthHeader(token), request)
@@ -136,7 +128,54 @@ class GitHubRepository {
                 ApiResult.Error("Failed to create repo: ${response.message()}", response.code())
             }
         } catch (e: Exception) {
-            ApiResult.Error(e.localizedMessage ?: "Failed to connect to GitHub API")
+            ApiResult.Error(e.localizedMessage ?: "Network error")
+        }
+    }
+
+    suspend fun starRepo(token: String, owner: String, repo: String): ApiResult<Unit> {
+        return try {
+            val response = apiService.starRepo(formatAuthHeader(token), owner, repo)
+            if (response.isSuccessful || response.code() == 204) ApiResult.Success(Unit)
+            else ApiResult.Error("Star failed: ${response.message()}", response.code())
+        } catch (e: Exception) {
+            ApiResult.Error(e.localizedMessage ?: "Network error")
+        }
+    }
+
+    suspend fun unstarRepo(token: String, owner: String, repo: String): ApiResult<Unit> {
+        return try {
+            val response = apiService.unstarRepo(formatAuthHeader(token), owner, repo)
+            if (response.isSuccessful || response.code() == 204) ApiResult.Success(Unit)
+            else ApiResult.Error("Unstar failed: ${response.message()}", response.code())
+        } catch (e: Exception) {
+            ApiResult.Error(e.localizedMessage ?: "Network error")
+        }
+    }
+
+    suspend fun getNotifications(token: String): ApiResult<List<GitHubNotification>> {
+        return try {
+            val response = apiService.getNotifications(formatAuthHeader(token))
+            if (response.isSuccessful && response.body() != null) {
+                ApiResult.Success(response.body()!!)
+            } else {
+                ApiResult.Error("Failed to fetch notifications: ${response.message()}", response.code())
+            }
+        } catch (e: Exception) {
+            ApiResult.Error(e.localizedMessage ?: "Network error")
+        }
+    }
+
+    suspend fun searchRepositories(token: String, query: String): ApiResult<List<GitHubRepo>> {
+        return try {
+            if (query.isBlank()) return ApiResult.Success(emptyList())
+            val response = apiService.searchRepositories(formatAuthHeader(token), query)
+            if (response.isSuccessful && response.body() != null) {
+                ApiResult.Success(response.body()!!.items)
+            } else {
+                ApiResult.Error("Search failed: ${response.message()}", response.code())
+            }
+        } catch (e: Exception) {
+            ApiResult.Error(e.localizedMessage ?: "Network error")
         }
     }
 }
