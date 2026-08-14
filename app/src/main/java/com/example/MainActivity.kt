@@ -12,16 +12,13 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Lock
@@ -35,12 +32,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -52,10 +46,9 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.data.*
 import com.example.ui.AuthState
+import com.example.ui.BuilderScreen
 import com.example.ui.GitHubViewModel
 import com.example.ui.theme.MyApplicationTheme
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private val viewModel: GitHubViewModel by viewModels()
@@ -188,9 +181,6 @@ fun LoginScreen(errorMessage: String?, onLogin: (String) -> Unit) {
 @Composable
 fun MainAppScreen(user: GitHubUser, viewModel: GitHubViewModel) {
     val context = LocalContext.current
-    val clipboardManager = LocalClipboardManager.current
-    val scope = rememberCoroutineScope()
-
     val reposResult by viewModel.reposState.collectAsState()
     val issuesResult by viewModel.issuesState.collectAsState()
     val workflowRunsResult by viewModel.workflowRunsState.collectAsState()
@@ -200,22 +190,10 @@ fun MainAppScreen(user: GitHubUser, viewModel: GitHubViewModel) {
     val repoCreationState by viewModel.repoCreationState.collectAsState()
 
     var selectedTab by remember { mutableIntStateOf(0) }
-    var promptInput by remember { mutableStateOf("Note list screen with search and Room database") }
-    var selectedFileIndex by remember { mutableIntStateOf(0) }
-    var isGenerating by remember { mutableStateOf(false) }
-    var includeRoom by remember { mutableStateOf(true) }
-    var includeHilt by remember { mutableStateOf(false) }
-    var includeWorkflows by remember { mutableStateOf(true) }
-    var includeGemini by remember { mutableStateOf(false) }
-
     var showCreateRepoDialog by remember { mutableStateOf(false) }
     var newRepoName by remember { mutableStateOf("") }
     var newRepoDesc by remember { mutableStateOf("") }
     var newRepoPrivate by remember { mutableStateOf(false) }
-
-    val projectFiles = remember(promptInput, includeRoom, includeHilt, includeWorkflows, includeGemini) {
-        generateProjectFiles(promptInput, includeRoom, includeHilt, includeWorkflows, includeGemini, "24")
-    }
 
     val tabs = listOf("Repos", "Search", "Issues", "Actions", "Notifs", "Builder")
 
@@ -285,43 +263,7 @@ fun MainAppScreen(user: GitHubUser, viewModel: GitHubViewModel) {
                         onRefresh = { viewModel.refreshData() },
                         onOpenWeb = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
                     )
-                    5 -> AppBuilderGeneratorView(
-                        promptInput = promptInput,
-                        onPromptChange = { promptInput = it },
-                        presetPrompts = listOf(
-                            "Note list with search",
-                            "Login form email password",
-                            "Weather app with Retrofit",
-                            "Fitness tracker steps",
-                            "Simple todo list"
-                        ),
-                        includeRoom = includeRoom,
-                        onToggleRoom = { includeRoom = !includeRoom },
-                        includeHilt = includeHilt,
-                        onToggleHilt = { includeHilt = !includeHilt },
-                        includeWorkflows = includeWorkflows,
-                        onToggleWorkflows = { includeWorkflows = !includeWorkflows },
-                        includeGemini = includeGemini,
-                        onToggleGemini = { includeGemini = !includeGemini },
-                        isGenerating = isGenerating,
-                        onGenerate = {
-                            scope.launch {
-                                isGenerating = true
-                                delay(300)
-                                isGenerating = false
-                            }
-                        },
-                        projectFiles = projectFiles,
-                        selectedFileIndex = selectedFileIndex,
-                        onSelectFile = { selectedFileIndex = it },
-                        onCopyFile = {
-                            clipboardManager.setText(AnnotatedString(it))
-                            Toast.makeText(context, "Copied!", Toast.LENGTH_SHORT).show()
-                        },
-                        onCreateRemoteRepo = { name ->
-                            viewModel.createRepositoryOnGitHub(name, "Generated: $promptInput", false)
-                        }
-                    )
+                    5 -> BuilderScreen(viewModel = viewModel)
                 }
             }
         }
@@ -384,7 +326,6 @@ fun RealReposView(
     onOpenWeb: (String) -> Unit
 ) {
     var localFilter by remember { mutableStateOf("") }
-
     Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             OutlinedTextField(
@@ -403,26 +344,14 @@ fun RealReposView(
                 Text("New")
             }
         }
-
         if (selectedRepo != null) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FilterChip(
-                    selected = true,
-                    onClick = {},
-                    label = { Text(selectedRepo.name, maxLines = 1) }
-                )
-                IconButton(onClick = onStar) {
-                    Icon(Icons.Default.Star, "Star", tint = Color(0xFFEAB308))
-                }
-                IconButton(onClick = onUnstar) {
-                    Icon(Icons.Outlined.StarBorder, "Unstar")
-                }
-                IconButton(onClick = { onOpenWeb(selectedRepo.htmlUrl) }) {
-                    Icon(Icons.Default.OpenInNew, "Open")
-                }
+                FilterChip(selected = true, onClick = {}, label = { Text(selectedRepo.name, maxLines = 1) })
+                IconButton(onClick = onStar) { Icon(Icons.Default.Star, "Star", tint = Color(0xFFEAB308)) }
+                IconButton(onClick = onUnstar) { Icon(Icons.Outlined.StarBorder, "Unstar") }
+                IconButton(onClick = { onOpenWeb(selectedRepo.htmlUrl) }) { Icon(Icons.Default.OpenInNew, "Open") }
             }
         }
-
         when (reposResult) {
             is ApiResult.Loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
             is ApiResult.Error -> Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)) {
@@ -439,12 +368,7 @@ fun RealReposView(
                 } else {
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         items(filtered, key = { it.id }) { repo ->
-                            RepoCard(
-                                repo = repo,
-                                isSelected = selectedRepo?.id == repo.id,
-                                onClick = { onSelectRepo(repo) },
-                                onOpenWeb = { onOpenWeb(repo.htmlUrl) }
-                            )
+                            RepoCard(repo, selectedRepo?.id == repo.id, { onSelectRepo(repo) }, { onOpenWeb(repo.htmlUrl) })
                         }
                     }
                 }
@@ -462,7 +386,6 @@ fun SearchReposView(
 ) {
     var query by remember { mutableStateOf("") }
     val keyboard = LocalSoftwareKeyboardController.current
-
     Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("Search GitHub", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -475,30 +398,14 @@ fun SearchReposView(
                 shape = RoundedCornerShape(12.dp),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                keyboardActions = KeyboardActions(onSearch = {
-                    onSearch(query.trim())
-                    keyboard?.hide()
-                })
+                keyboardActions = KeyboardActions(onSearch = { onSearch(query.trim()); keyboard?.hide() })
             )
             Spacer(Modifier.width(8.dp))
-            Button(
-                onClick = {
-                    onSearch(query.trim())
-                    keyboard?.hide()
-                },
-                enabled = query.isNotBlank(),
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.height(56.dp)
-            ) {
+            Button(onClick = { onSearch(query.trim()); keyboard?.hide() }, enabled = query.isNotBlank(), shape = RoundedCornerShape(12.dp), modifier = Modifier.height(56.dp)) {
                 Text("Go")
             }
         }
-        Text(
-            "Tips: language:kotlin  stars:>100  user:davealone69-gif",
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-
+        Text("Tips: language:kotlin  stars:>100  user:davealone69-gif", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         when (searchResult) {
             is ApiResult.Loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
             is ApiResult.Error -> Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)) {
@@ -507,21 +414,13 @@ fun SearchReposView(
             is ApiResult.Success -> {
                 if (searchResult.data.isEmpty()) {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(
-                            if (query.isBlank()) "Type a query and hit Go" else "No results",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        Text(if (query.isBlank()) "Type a query and hit Go" else "No results", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 } else {
                     Text("${searchResult.data.size} results", style = MaterialTheme.typography.labelMedium)
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         items(searchResult.data, key = { it.id }) { repo ->
-                            RepoCard(
-                                repo = repo,
-                                isSelected = false,
-                                onClick = { onSelectRepo(repo) },
-                                onOpenWeb = { onOpenWeb(repo.htmlUrl) }
-                            )
+                            RepoCard(repo, false, { onSelectRepo(repo) }, { onOpenWeb(repo.htmlUrl) })
                         }
                     }
                 }
@@ -561,8 +460,7 @@ fun NotificationsView(
                                 },
                                 shape = RoundedCornerShape(12.dp),
                                 colors = CardDefaults.cardColors(
-                                    containerColor = if (n.unread) MaterialTheme.colorScheme.primaryContainer.copy(0.35f)
-                                    else MaterialTheme.colorScheme.surface
+                                    containerColor = if (n.unread) MaterialTheme.colorScheme.primaryContainer.copy(0.35f) else MaterialTheme.colorScheme.surface
                                 )
                             ) {
                                 Column(Modifier.padding(14.dp)) {
@@ -576,20 +474,10 @@ fun NotificationsView(
                                             null,
                                             tint = MaterialTheme.colorScheme.primary
                                         )
-                                        Text(
-                                            n.subject?.title ?: "Notification",
-                                            fontWeight = FontWeight.Bold,
-                                            maxLines = 2,
-                                            overflow = TextOverflow.Ellipsis,
-                                            modifier = Modifier.weight(1f)
-                                        )
+                                        Text(n.subject?.title ?: "Notification", fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
                                     }
                                     Spacer(Modifier.height(4.dp))
-                                    Text(
-                                        "${n.repository?.fullName ?: ""} • ${n.reason ?: ""}",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
+                                    Text("${n.repository?.fullName ?: ""} • ${n.reason ?: ""}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 }
                             }
                         }
@@ -601,12 +489,7 @@ fun NotificationsView(
 }
 
 @Composable
-fun RepoCard(
-    repo: GitHubRepo,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-    onOpenWeb: () -> Unit
-) {
+fun RepoCard(repo: GitHubRepo, isSelected: Boolean, onClick: () -> Unit, onOpenWeb: () -> Unit) {
     Card(
         Modifier.fillMaxWidth().clickable(onClick = onClick),
         shape = RoundedCornerShape(12.dp),
@@ -667,11 +550,7 @@ fun RealIssuesView(issuesResult: ApiResult<List<GitHubIssue>>, onOpenWeb: (Strin
                                 Column(Modifier.padding(14.dp)) {
                                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.weight(1f)) {
-                                            Icon(
-                                                if (isPr) Icons.Default.MergeType else Icons.Default.BugReport,
-                                                null,
-                                                tint = if (isPr) Color(0xFFA855F7) else Color(0xFF10B981)
-                                            )
+                                            Icon(if (isPr) Icons.Default.MergeType else Icons.Default.BugReport, null, tint = if (isPr) Color(0xFFA855F7) else Color(0xFF10B981))
                                             Text("#${issue.number} ${issue.title}", fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
                                         }
                                         SuggestionChip(
@@ -753,143 +632,6 @@ fun RealWorkflowRunsView(
                                     }
                                     Icon(Icons.Default.OpenInNew, null, Modifier.size(16.dp))
                                 }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun AppBuilderGeneratorView(
-    promptInput: String,
-    onPromptChange: (String) -> Unit,
-    presetPrompts: List<String>,
-    includeRoom: Boolean,
-    onToggleRoom: () -> Unit,
-    includeHilt: Boolean,
-    onToggleHilt: () -> Unit,
-    includeWorkflows: Boolean,
-    onToggleWorkflows: () -> Unit,
-    includeGemini: Boolean,
-    onToggleGemini: () -> Unit,
-    isGenerating: Boolean,
-    onGenerate: () -> Unit,
-    projectFiles: List<GeneratedFile>,
-    selectedFileIndex: Int,
-    onSelectFile: (Int) -> Unit,
-    onCopyFile: (String) -> Unit,
-    onCreateRemoteRepo: (String) -> Unit
-) {
-    Column(Modifier.fillMaxSize().padding(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Card(
-            Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(0.5f))
-        ) {
-            Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text("Text → Kotlin Code Maker", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-                OutlinedTextField(
-                    value = promptInput,
-                    onValueChange = onPromptChange,
-                    modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("Describe the screen or app...") },
-                    maxLines = 2,
-                    shape = RoundedCornerShape(12.dp)
-                )
-                Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    presetPrompts.forEach { p ->
-                        SuggestionChip(onClick = { onPromptChange(p) }, label = { Text(p, style = MaterialTheme.typography.labelSmall) })
-                    }
-                }
-                Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    FilterChip(selected = includeRoom, onClick = onToggleRoom, label = { Text("Room") })
-                    FilterChip(selected = includeHilt, onClick = onToggleHilt, label = { Text("Hilt") })
-                    FilterChip(selected = includeWorkflows, onClick = onToggleWorkflows, label = { Text("CI") })
-                    FilterChip(selected = includeGemini, onClick = onToggleGemini, label = { Text("Gemini") })
-                }
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(onClick = onGenerate, modifier = Modifier.weight(1f), enabled = !isGenerating, shape = RoundedCornerShape(10.dp)) {
-                        Text("Generate Kotlin")
-                    }
-                    Button(
-                        onClick = {
-                            val slug = promptInput.lowercase().replace(Regex("[^a-z0-9]"), "-").take(20).trim('-')
-                            onCreateRemoteRepo("app-$slug")
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)),
-                        shape = RoundedCornerShape(10.dp)
-                    ) {
-                        Icon(Icons.Default.CloudUpload, null, Modifier.size(16.dp))
-                        Spacer(Modifier.width(4.dp))
-                        Text("Repo")
-                    }
-                }
-            }
-        }
-        CodeExplorerView(projectFiles, selectedFileIndex, onSelectFile, onCopyFile)
-    }
-}
-
-@Composable
-fun CodeExplorerView(
-    files: List<GeneratedFile>,
-    selectedIndex: Int,
-    onSelectFile: (Int) -> Unit,
-    onCopyFile: (String) -> Unit
-) {
-    val current = files.getOrNull(selectedIndex) ?: files.firstOrNull()
-    Row(Modifier.fillMaxSize()) {
-        LazyColumn(
-            Modifier.width(140.dp).fillMaxHeight().background(MaterialTheme.colorScheme.surface)
-                .border(0.5.dp, MaterialTheme.colorScheme.outlineVariant),
-            contentPadding = PaddingValues(vertical = 8.dp)
-        ) {
-            items(files.indices.toList()) { idx ->
-                val file = files[idx]
-                val selected = idx == selectedIndex
-                Surface(
-                    onClick = { onSelectFile(idx) },
-                    color = if (selected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 2.dp),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Row(Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Icon(
-                            when (file.category) {
-                                "Workflow" -> Icons.Default.Build
-                                "Docs" -> Icons.Default.InsertDriveFile
-                                else -> Icons.Default.Code
-                            },
-                            null,
-                            Modifier.size(16.dp),
-                            tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Text(file.path.substringAfterLast("/"), style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis, fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal)
-                    }
-                }
-            }
-        }
-        if (current != null) {
-            Column(Modifier.fillMaxSize().padding(8.dp)) {
-                Row(
-                    Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(current.path, style = MaterialTheme.typography.labelMedium, fontFamily = FontFamily.Monospace, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-                    IconButton(onClick = { onCopyFile(current.content) }, modifier = Modifier.size(28.dp)) {
-                        Icon(Icons.Default.ContentCopy, "Copy", Modifier.size(16.dp))
-                    }
-                }
-                Surface(Modifier.fillMaxSize().clip(RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)), color = MaterialTheme.colorScheme.surface) {
-                    SelectionContainer {
-                        LazyColumn(Modifier.fillMaxSize().padding(12.dp)) {
-                            item {
-                                Text(current.content, fontFamily = FontFamily.Monospace, fontSize = 12.sp)
                             }
                         }
                     }
