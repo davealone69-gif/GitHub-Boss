@@ -1,5 +1,4 @@
- // PERMANENT WORKING FILE — copy to app/build.gradle.kts when AI breaks it
-plugins {
+{
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
 }
