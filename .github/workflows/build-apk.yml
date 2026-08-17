@@ -42,6 +42,16 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
 
+    - name: Restore Gradle wrapper from apk-build-kit
+      shell: bash
+      run: |
+        set -euo pipefail
+        mkdir -p gradle/wrapper
+        cp apk-build-kit/gradle-wrapper.jar gradle/wrapper/gradle-wrapper.jar
+        test -s gradle/wrapper/gradle-wrapper.jar
+        unzip -t gradle/wrapper/gradle-wrapper.jar >/dev/null
+        java -jar gradle/wrapper/gradle-wrapper.jar --version
+
     - name: Grant execute permission for gradlew
       run: chmod +x ./gradlew
 
