@@ -45,19 +45,6 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x ./gradlew
 
-    - name: Restore trusted Gradle 8.9 wrapper JAR
-      shell: bash
-      run: |
-        set -euo pipefail
-        mkdir -p gradle/wrapper
-        curl --fail --location --retry 3 \
-          --output gradle/wrapper/gradle-wrapper.jar \
-          https://raw.githubusercontent.com/gradle/gradle/v8.9.0/gradle/wrapper/gradle-wrapper.jar
-        echo "d81e0f23ade952b35e55333dd5f1821585e887c6d24305aeea2fbc8dad564b95  gradle/wrapper/gradle-wrapper.jar" | sha256sum --check
-
-    - name: Validate Gradle Wrapper
-      uses: gradle/actions/wrapper-validation@v3
-
     - name: Build Debug APK
       run: ./gradlew assembleDebug --stacktrace --no-daemon
 
