@@ -20,7 +20,6 @@ jobs:
       with:
         distribution: temurin
         java-version: 17
-        cache: gradle
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
@@ -32,41 +31,28 @@ jobs:
         yes | sdkmanager --licenses >/dev/null || true
         sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
-    - name: Cache Gradle
-      uses: actions/cache@v4
+    - name: Setup Gradle 8.9
+      uses: gradle/actions/setup-gradle@v4
       with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/libs.versions.toml') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
+        gradle-version: '8.9'
+        cache-read-only: false
 
-    - name: Restore Gradle wrapper from apk-build-kit
-      shell: bash
-      run: |
-        set -euo pipefail
-        mkdir -p gradle/wrapper
-        cp apk-build-kit/gradle-wrapper.jar gradle/wrapper/gradle-wrapper.jar
-        test -s gradle/wrapper/gradle-wrapper.jar
-        unzip -t gradle/wrapper/gradle-wrapper.jar >/dev/null
-        java -jar gradle/wrapper/gradle-wrapper.jar --version
-
-    - name: Grant execute permission for gradlew
-      run: chmod +x ./gradlew
+    - name: Show Gradle version
+      run: gradle --version
 
     - name: Build Debug APK
-      run: ./gradlew assembleDebug --stacktrace --no-daemon
+      run: gradle assembleDebug --stacktrace --no-daemon
 
     - name: Verify Debug APK
       shell: bash
       run: |
         set -euo pipefail
-        test -s app/build/outputs/apk/debug/app-debug.apk
-        file app/build/outputs/apk/debug/app-debug.apk
-        unzip -t app/build/outputs/apk/debug/app-debug.apk >/dev/null
+        APK="app/build/outputs/apk/debug/app-debug.apk"
+        test -s "$APK"
+        file "$APK"
+        unzip -t "$APK" >/dev/null
         echo "APK SHA-256:"
-        sha256sum app/build/outputs/apk/debug/app-debug.apk
+        sha256sum "$APK"
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
