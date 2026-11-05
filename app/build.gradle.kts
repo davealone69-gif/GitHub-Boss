@@ -1,1 +1,136 @@
-Ly8gUEVSTUFORU5UIFdPUktJTkcgRklMRSDigJQgYmFzZWQgb24gYXBrLWJ1aWxkLWtpdCBrbm93bi1nb29kIGNvbmZpZwpwbHVnaW5zIHsKICAgIGFsaWFzKGxpYnMucGx1Z2lucy5hbmRyb2lkLmFwcGxpY2F0aW9uKQogICAgYWxpYXMobGlicy5wbHVnaW5zLmtvdGxpbi5hbmRyb2lkKQogICAgYWxpYXMobGlicy5wbHVnaW5zLmtvdGxpbi5jb21wb3NlKQp9CgphbmRyb2lkIHsKICAgIG5hbWVzcGFjZSA9ICJjb20udGhyZWVkb3VibGUuZCIKICAgIGNvbXBpbGVTZGsgPSAzNQoKICAgIGRlZmF1bHRDb25maWcgewogICAgICAgIGFwcGxpY2F0aW9uSWQgPSAiY29tLnRocmVlZG91YmxlLmQiCiAgICAgICAgbWluU2RrID0gMjYKICAgICAgICB0YXJnZXRTZGsgPSAzNQogICAgICAgIHZlcnNpb25Db2RlID0gMgogICAgICAgIHZlcnNpb25OYW1lID0gIjEuMS4wIgogICAgfQoKICAgIHNpZ25pbmdDb25maWdzIHsKICAgICAgICBjcmVhdGUoInJlbGVhc2UiKSB7CiAgICAgICAgICAgIHN0b3JlRmlsZSA9IGZpbGUoIi9ob21lL3VzZXIvM2RkLXJlbGVhc2Uua2V5c3RvcmUiKQogICAgICAgICAgICBzdG9yZVBhc3N3b3JkID0gIjNkZHN0b3JlcGFzcyIKICAgICAgICAgICAga2V5QWxpYXMgPSAiM2RkIgogICAgICAgICAgICBrZXlQYXNzd29yZCA9ICIzZGRzdG9yZXBhc3MiCiAgICAgICAgfQogICAgfQoKICAgIGJ1aWxkVHlwZXMgewogICAgICAgIHJlbGVhc2UgewogICAgICAgICAgICBpc01pbmlmeUVuYWJsZWQgPSBmYWxzZQogICAgICAgICAgICBzaWduaW5nQ29uZmlnID0gc2lnbmluZ0NvbmZpZ3MuZ2V0QnlOYW1lKCJyZWxlYXNlIikKICAgICAgICAgICAgcHJvZ3VhcmRGaWxlcygKICAgICAgICAgICAgICAgIGdldERlZmF1bHRQcm9ndWFyZEZpbGUoInByb2d1YXJkLWFuZHJvaWQtb3B0aW1pemUudHh0IiksCiAgICAgICAgICAgICAgICAicHJvZ3VhcmQtcnVsZXMucHJvIgogICAgICAgICAgICApCiAgICAgICAgfQogICAgfQoKICAgIGNvbXBpbGVPcHRpb25zIHsKICAgICAgICBzb3VyY2VDb21wYXRpYmlsaXR5ID0gSmF2YVZlcnNpb24uVkVSU0lPTl8xNwogICAgICAgIHRhcmdldENvbXBhdGliaWxpdHkgPSBKYXZhVmVyc2lvbi5WRVJTSU9OXzE3CiAgICAgICAgaXNDb3JlTGlicmFyeURlc3VnYXJpbmdFbmFibGVkID0gdHJ1ZQogICAgfQoKICAgIGJ1aWxkRmVhdHVyZXMgewogICAgICAgIGNvbXBvc2UgPSB0cnVlCiAgICAgICAgYnVpbGRDb25maWcgPSB0cnVlCiAgICB9CgogICAgcGFja2FnaW5nIHsKICAgICAgICByZXNvdXJjZXMgewogICAgICAgICAgICBleGNsdWRlcyArPSAiL01FVEEtSU5GL3tBTDIuMCxMR1BMMi4xfSIKICAgICAgICB9CiAgICB9Cn0KCmtvdGxpbiB7CiAgICBjb21waWxlck9wdGlvbnMgewogICAgICAgIGp2bVRhcmdldCA9IG9yZy5qZXRicmFpbnMua290bGluLmdyYWRsZS5kc2wuSnZtVGFyZ2V0LkpWTV8xNwogICAgfQp9CgpkZXBlbmRlbmNpZXMgewogICAgaW1wbGVtZW50YXRpb24ocGxhdGZvcm0obGlicy5hbmRyb2lkeC5jb21wb3NlLmJvbSkpCiAgICBpbXBsZW1lbnRhdGlvbihsaWJzLmFuZHJvaWR4LmNvbXBvc2UudWkpCiAgICBpbXBsZW1lbnRhdGlvbihsaWJzLmFuZHJvaWR4LmNvbXBvc2UudWkuZ3JhcGhpY3MpCiAgICBpbXBsZW1lbnRhdGlvbihsaWJzLmFuZHJvaWR4LmNvbXBvc2UudWkudG9vbGluZy5wcmV2aWV3KQogICAgaW1wbGVtZW50YXRpb24obGlicy5hbmRyb2lkeC5jb21wb3NlLm1hdGVyaWFsMykKICAgIGltcGxlbWVudGF0aW9uKGxpYnMuYW5kcm9pZHguY29tcG9zZS5tYXRlcmlhbC5pY29ucy5leHRlbmRlZCkKICAgIGRlYnVnSW1wbGVtZW50YXRpb24obGlicy5hbmRyb2lkeC5jb21wb3NlLnVpLnRvb2xpbmcpCgogICAgaW1wbGVtZW50YXRpb24obGlicy5hbmRyb2lkeC5hY3Rpdml0eS5jb21wb3NlKQogICAgaW1wbGVtZW50YXRpb24obGlicy5hbmRyb2lkeC5saWZlY3ljbGUucnVudGltZS5rdHgpCiAgICBpbXBsZW1lbnRhdGlvbihsaWJzLmFuZHJvaWR4LmxpZmVjeWNsZS52aWV3bW9kZWwuY29tcG9zZSkKICAgIGltcGxlbWVudGF0aW9uKGxpYnMuYW5kcm9pZHgubGlmZWN5Y2xlLnJ1bnRpbWUuY29tcG9zZSkKICAgIGltcGxlbWVudGF0aW9uKGxpYnMuYW5kcm9pZHguY29yZS5rdHgpCiAgICBpbXBsZW1lbnRhdGlvbihsaWJzLmFuZHJvaWR4Lm5hdmlnYXRpb24uY29tcG9zZSkKCiAgICBpbXBsZW1lbnRhdGlvbihsaWJzLmdvb2dsZS5maWxhbWVudCkKICAgIGltcGxlbWVudGF0aW9uKGxpYnMuZ29vZ2xlLmdsdGZpbykKCiAgICBpbXBsZW1lbnRhdGlvbihsaWJzLmNvaWwuY29tcG9zZSkKICAgIGltcGxlbWVudGF0aW9uKGxpYnMua290bGlueC5jb3JvdXRpbmVzLmFuZHJvaWQpCiAgICBpbXBsZW1lbnRhdGlvbihsaWJzLmFuZHJvaWR4Lm1lZGlhMy5leG9wbGF5ZXIpCiAgICBjb3JlTGlicmFyeURlc3VnYXJpbmcobGlicy5hbmRyb2lkeC5kZXN1Z2FyLmpkay5saWJzKQp9Cg==
+// Security-safe Kotlin DSL conversion.
+// Release signing is configured only from protected Gradle properties or environment variables.
+// Debug builds do not require release credentials.
+
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
+}
+
+val releaseStoreFile = providers.gradleProperty("releaseStoreFile")
+    .orElse(providers.environmentVariable("RELEASE_STORE_FILE"))
+val releaseStorePassword = providers.gradleProperty("releaseStorePassword")
+    .orElse(providers.environmentVariable("RELEASE_STORE_PASSWORD"))
+val releaseKeyAlias = providers.gradleProperty("releaseKeyAlias")
+    .orElse(providers.environmentVariable("RELEASE_KEY_ALIAS"))
+val releaseKeyPassword = providers.gradleProperty("releaseKeyPassword")
+    .orElse(providers.environmentVariable("RELEASE_KEY_PASSWORD"))
+
+val releaseSigningConfigured = releaseStoreFile.isPresent &&
+    releaseStorePassword.isPresent &&
+    releaseKeyAlias.isPresent &&
+    releaseKeyPassword.isPresent
+
+android {
+    namespace = "com.threedouble.d"
+    compileSdk = 35
+
+    defaultConfig {
+        applicationId = "com.threedouble.d"
+        minSdk = 26
+        targetSdk = 35
+        versionCode = 2
+        versionName = "1.1.0"
+    }
+
+    if (releaseSigningConfigured) {
+        signingConfigs {
+            create("release") {
+                storeFile = file(releaseStoreFile.get())
+                storePassword = releaseStorePassword.get()
+                keyAlias = releaseKeyAlias.get()
+                keyPassword = releaseKeyPassword.get()
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            if (releaseSigningConfigured) {
+                signingConfig = signingConfigs.getByName("release")
+            }
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+        isCoreLibraryDesugaringEnabled = true
+    }
+
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
+
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+    }
+}
+
+dependencies {
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.graphics)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
+    debugImplementation(libs.androidx.compose.ui.tooling)
+
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.navigation.compose)
+
+    implementation(libs.google.filament)
+    implementation(libs.google.gltfio)
+
+    implementation(libs.coil.compose)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.androidx.media3.exoplayer)
+    coreLibraryDesugaring(libs.androidx.desugar.jdk.libs)
+}
+
+// Every release task depends on this guard. No release artifact can be produced unsigned.
+val verifyReleaseSigning by tasks.registering {
+    group = "verification"
+    description = "Verifies that release signing credentials and keystore are available."
+
+    doLast {
+        val missing = buildList {
+            if (!releaseStoreFile.isPresent) add("RELEASE_STORE_FILE")
+            if (!releaseStorePassword.isPresent) add("RELEASE_STORE_PASSWORD")
+            if (!releaseKeyAlias.isPresent) add("RELEASE_KEY_ALIAS")
+            if (!releaseKeyPassword.isPresent) add("RELEASE_KEY_PASSWORD")
+        }
+        check(missing.isEmpty()) {
+            "Release signing is blocked. Configure protected Gradle properties or environment variables: ${missing.joinToString()}"
+        }
+        val keystore = file(releaseStoreFile.get())
+        check(keystore.isFile) {
+            "Release signing is blocked. The configured keystore file does not exist: ${keystore.name}"
+        }
+    }
+}
+
+tasks.configureEach {
+    if (name.contains("Release") && name != verifyReleaseSigning.name) {
+        dependsOn(verifyReleaseSigning)
+    }
+}

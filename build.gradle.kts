@@ -1,1 +1,6 @@
-Ly8gUEVSTUFORU5UIFdPUktJTkcgRklMRSDigJQgZG8gbm90IGxldCBBSSBTdHVkaW8gcmV3cml0ZSB0aGlzCnBsdWdpbnMgewogICAgYWxpYXMobGlicy5wbHVnaW5zLmFuZHJvaWQuYXBwbGljYXRpb24pIGFwcGx5IGZhbHNlCiAgICBhbGlhcyhsaWJzLnBsdWdpbnMua290bGluLmNvbXBvc2UpIGFwcGx5IGZhbHNlCiAgICBhbGlhcyhsaWJzLnBsdWdpbnMua290bGluLmFuZHJvaWQpIGFwcGx5IGZhbHNlCn0K
+// PERMANENT WORKING FILE — do not let AI Studio rewrite this
+plugins {
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.kotlin.compose) apply false
+    alias(libs.plugins.kotlin.android) apply false
+}
