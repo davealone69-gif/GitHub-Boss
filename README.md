@@ -1,5 +1,11 @@
 # GitHub-Boss
 
+## Download the latest Android APK
+
+[**⬇ Download latest debug APK**](https://github.com/davealone69-gif/GitHub-Boss/releases/latest/download/latest-debug.apk)
+
+This direct download is refreshed after each successful Android build on `main`. It is a debug/test APK, not a production-signed release.
+
 **Ultimate GitHub control tool for Android** — no need to open the website for everyday tasks.
 
 ## Features
